@@ -22,9 +22,9 @@ The architecture implements a standard metrics collection and time-series monito
 ## 🗂️ Repository Structure
 ```text
 ├── dags/
-│   └── crypto_pipeline_dag.py   # Airflow DAG automation file
+│   └── crypto_dag.py   # Airflow DAG automation file
 ├── scripts/
-│   └── crypto_fetcher.py        # Python API ingestion script
+│   └── ingestion.py        # Python API ingestion script
 ├── docker-compose.yml           # Multi-container Docker configuration
 └── README.md                    # Project documentation
 ```
