@@ -1,30 +1,67 @@
-# crypto-automation-etl
-Project Title: Real-Time Crypto Market Tracker📊 Problem StatementCryptocurrency markets operate 24/7 with massive price volatility. Investors and analysts need a reliable, automated system to track hourly price fluctuations, calculate rolling averages, and visualize trends without manual intervention. You must build an automated pipeline that ingests live market data, cleans it, stores it in a structured database, and updates a dashboard.
+# Real-Time Crypto Market Tracker & Metrics Pipeline
 
-⚙️ # Architecture & Tool IntegrationData Source:
-* Fetch live prices using Python from a free public API (e.g., CoinGecko API or CoinDesk API).
-* Orchestration: Use Apache Airflow to schedule and run the Python ingestion script every hour.
-* Containerisation: Run your Airflow environment and your database inside Docker containers using Docker Compose.
-* Storage: Write the ingested data into a SQL database (e.g., PostgreSQL) running in Docker.Transformation:
-* Use SQL queries or Python to calculate basic metrics like 24-hour price changes.
-* Visualization: Connect Tableau to your SQL database to build a auto-refreshing line chart of price trends.
+## 📌 Project Overview
+This project is an automated, end-to-end data engineering pipeline designed to ingest, store, and track real-time cryptocurrency market trends. The infrastructure is entirely containerized using Docker, utilizing Apache Airflow for workflow orchestration, MySQL as the relational storage layer, and Grafana for live telemetry and analytical visualizations.
 
-🛠️#  Step-by-Step Implementation PlanSet Up Docker: 
-* Create a docker-compose.yml file to launch Apache Airflow and a PostgreSQL database locally.
-* Write Ingestion Script: Create a Python script using the requests library to pull current Bitcoin and Ethereum prices from the API.
-* Build SQL Schema: Create a database table with columns for timestamp, coin_name, price_usd, and 24h_volume.
-* Create Airflow DAG: Write a simple Directed Acyclic Graph (DAG) with two tasks: Task 1 checks if the API is online, and Task 2 runs your Python ingestion script to append data to SQL.
-* Connect Tableau: Open Tableau Desktop, choose the PostgreSQL connector, point it to your local database, and design your trend dashboard.
+## 🏗️ Architecture & Tech Stack
+The architecture implements a standard metrics collection and time-series monitoring pipeline:
 
-  ### 🐳 Step 1: Docker Compose Setup
-  Create a file named docker-compose.yml. This file pulls and runs PostgreSQL (your SQL database) and Apache Airflow in isolated containers that can easily talk to each other.yam
+```text
+[CoinGecko API] 
+       │ (Python Script)
+       ▼
+[Apache Airflow] ────► [MySQL Database] ────► [Grafana]
+ (Orchestrator)          (Docker Storage)     (Live Dashboard)
+```
 
-  ### Step 2: SQL Table Schema
+*   **Orchestration:** **Apache Airflow 2.5.1** configured in `standalone` mode to schedule hourly execution scripts.
+*   **Containerization:** **Docker & Docker Compose** to provision and network isolated microservices locally.
+*   **Storage:** **MySQL 8.0** relational database engine optimized for transactional tracking.
+*   **Visualization:** **Grafana (Latest)** web-based visualizer pulling directly from the database layer.
 
+## 🗂️ Repository Structure
+```text
+├── dags/
+│   └── crypto_pipeline_dag.py   # Airflow DAG automation file
+├── scripts/
+│   └── crypto_fetcher.py        # Python API ingestion script
+├── docker-compose.yml           # Multi-container Docker configuration
+└── README.md                    # Project documentation
+```
 
+## 🚀 How to Run Locally
 
-  ### 🐍 Step 3: Python Extraction Script
-  Save this script as crypto_fetcher.py. It uses the free, no-auth CoinGecko API to pull live market data for Bitcoin, Ethereum, and Solana, then formats it into a clean list of tuples.
+### Prerequisites
+*   [Docker Desktop](https://docker.com) installed and running.
 
-  ### 📈 Step 4: Connecting Tableau
+### Step 1: Clone the Repository
+```bash
+git clone https://github.com
+cd crypto-metrics-pipeline
+```
 
+### Step 2: Spin Up the Infrastructure
+Launch your isolated environments in detached background mode using your compose configuration:
+```bash
+docker compose up -d
+```
+
+### Step 3: Trigger the Data Pipeline
+1. Open your browser and navigate to the Airflow Web UI at **`http://localhost:8080`**.
+2. Locate your crypto workflow DAG and toggle it **On**.
+3. Trigger a manual run to execute your Python script and load data into the database.
+
+### Step 4: Configure Grafana Visualizations
+1. Navigate to Grafana at **`http://localhost:3000`** (Default credentials: username `admin` / password `admin`).
+2. Go to **Connections > Data Sources > Add Data Source** and choose **MySQL**.
+3. Fill in the connection properties matching the container network configurations:
+   * **Host:** `crypto_mysql:3306` (Uses Docker internal service bridge)
+   * **Database:** `crypto_data`
+   * **User:** `data_worker`
+   * **Password:** `cryptopassword`
+4. Click **Save & Test**. You can now construct time-series dashboard panels.
+
+## 📊 Key Data Engineering Principles Demonstrated
+*   **Containerized Portability:** Eliminated local system dependency issues by packing computing, storage, and analytics tools into isolated environments.
+*   **Database Management:** Leveraged isolated environment credentials (`crypto_data`) using secure schemas to manage data access layers.
+*   **Decoupled Architecture:** Separated storage (MySQL) from execution engines (Airflow) and presentation software (Grafana) to align with enterprise design standards.
