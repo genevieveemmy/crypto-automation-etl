@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  airflow:
+    image: apache/airflow:2.5.1
+    container_name: airflow_standalone
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./scripts:/opt/airflow/scripts
+      - airflow_home:/opt/airflow
+    command: standalone
+
+  mysql:
+    image: mysql:8.0
+    container_name: crypto_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: crypto_data
+      MYSQL_USER: data_worker
+      MYSQL_PASSWORD: cryptopassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: crypto_grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_storage:/var/lib/grafana
+    depends_on:
+      - mysql
+
+volumes:
+  mysql_data:
+  airflow_home:
+  grafana_storage:
