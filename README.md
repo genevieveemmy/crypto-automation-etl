@@ -17,7 +17,7 @@ The architecture implements a standard metrics collection and time-series monito
 *   **Orchestration:** **Apache Airflow 2.5.1** configured in `standalone` mode to schedule hourly execution scripts.
 *   **Containerization:** **Docker & Docker Compose** to provision and network isolated microservices locally.
 *   **Storage:** **MySQL 8.0** relational database engine optimized for transactional tracking.
-*   **Visualization:** **Grafana (Latest)** web-based visualizer pulling directly from the database layer.
+*   **Visualization:** **Grafana (Latest)** web-based visualizer pulling directly from the database layer. For real-time analytics and moving averages
 
 ## 🗂️ Repository Structure
 ```text
@@ -65,3 +65,4 @@ docker compose up -d
 *   **Containerized Portability:** Eliminated local system dependency issues by packing computing, storage, and analytics tools into isolated environments.
 *   **Database Management:** Leveraged isolated environment credentials (`crypto_data`) using secure schemas to manage data access layers.
 *   **Decoupled Architecture:** Separated storage (MySQL) from execution engines (Airflow) and presentation software (Grafana) to align with enterprise design standards.
+*   **Database Persistence** Containers are completely ephemeral by nature, when a container crashes, restarts, or updates, any data stored inside the container is wiped out instantly. Using volumes ensure that data persists beyond the container lifecycle.
