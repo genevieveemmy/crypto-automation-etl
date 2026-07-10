@@ -1,16 +1,20 @@
-version: '3.8'
-
 services:
   airflow:
     image: apache/airflow:2.5.1
     container_name: airflow_standalone
+    user: "0:0"
     ports:
-      - "8080:8080"
+      - "8085:8080"
     volumes:
       - ./dags:/opt/airflow/dags
       - ./scripts:/opt/airflow/scripts
-      - airflow_home:/opt/airflow
+    environment: 
+      - AIRFLOW__CORE__FERNET_KEY=fbZ1om4Eh2baZ2vsc8t29jEkZ667_fN8FvY4X_3A8uA=
+      - AIRFLOW__CORE__SECRET_KEY=secret_key_for_crypto_tracker
+      - _PIP_ADDITIONAL_DEPENDENCIES=requests pymysql cryptography
     command: standalone
+    networks:
+      - crypto_net
 
   mysql:
     image: mysql:8.0
@@ -21,21 +25,30 @@ services:
       MYSQL_USER: data_worker
       MYSQL_PASSWORD: cryptopassword
     ports:
-      - "3306:3306"
+      - "3308:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    networks:
+      - crypto_net
 
   grafana:
     image: grafana/grafana:latest
     container_name: crypto_grafana
+    user: "0:0"
     ports:
       - "3000:3000"
     volumes:
       - grafana_storage:/var/lib/grafana
     depends_on:
       - mysql
+    networks:
+      - crypto_net
 
 volumes:
   mysql_data:
-  airflow_home:
   grafana_storage:
+
+networks:
+  crypto_net:
+    driver: bridge
+ 
